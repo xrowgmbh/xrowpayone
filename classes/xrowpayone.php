@@ -42,20 +42,24 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             
             if ( count($response_array) >= 1 AND $response_array["status"] === "APPROVED" )
             {
-                //TODO write notice: capture successfull for $order->ID
+                eZLog::write("SUCCESS in step 3('capture') for order ID " . $order->ID, $logName = 'xrowpayone.log', $dir = 'var/log');
             }
             else
             {
-                var_dump($response_array["errorcode"]);
-                var_dump($response_array["errormessage"]);
-                die("drin");
-                //TODO ERROR
+                eZLog::write("FAILED in step 3('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');
+                //TODO-nice-to-have: add a error message for the editor when the capture was not successfull
+                //var_dump($response_array["errorcode"]);
+                //var_dump($response_array["errormessage"]);
+                die("Umstellung leider nicht möglich. Bitte wenden Sie sich an den Administrator.");
             }
         }
         else
         {
-            //TODO error
-            die("request fehlgeschlagen");
+            eZLog::write("ERROR: \$response not set or empty in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
+            //TODO-nice-to-have: add a error message for the editor when the capture was not successfull
+            //var_dump($response_array["errorcode"]);
+            //var_dump($response_array["errormessage"]);
+            die("Umstellung leider nicht möglich. Bitte wenden Sie sich an den Administrator.");
         }
 
         return true;
@@ -83,7 +87,7 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
 
         if ( !isset($txid) OR $txid == "" )
         {
-            //TODO ERROR
+            eZLog::write("ERROR: \$txid not set or empty in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
             return false;
         }
 
@@ -127,7 +131,7 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             $info = curl_getinfo( $ch );
             if ( $info['http_code'] != 200 )
             {
-                eZLog::write("Could not reach payone server (" . $url . ") during capture process in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
+                eZLog::write("ERROR: Could not reach payone server (" . $url . ") during capture process in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
             }
 
             //close connection
@@ -135,7 +139,7 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
         }
         else
         {
-            //TODO FEHLER
+            eZLog::write("ERROR: Function 'curl_init' not found in " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
         }
         return $result;
     }

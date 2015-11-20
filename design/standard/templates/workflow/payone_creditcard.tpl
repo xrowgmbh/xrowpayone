@@ -9,6 +9,7 @@
      $algorithm = ezini( 'GeneralSettings', 'Algorithm', 'xrowpayone.ini')
      $portal_id = ezini( 'GeneralSettings', 'PortalID', 'xrowpayone.ini')
      $encoding = ezini( 'GeneralSettings', 'Encoding', 'xrowpayone.ini')
+     $error_node = ezini( 'GeneralSettings', 'CustomErrorNode', 'xrowpayone.ini')
      $request_type = "creditcardcheck"
      $response_type = "JSON"
      $storecarddata = "yes"
@@ -24,8 +25,20 @@
 
     <div class="form">
         <h4>{"Please enter your credit card details"|i18n("extension/xrowpayone")}</h4>
-        <div id="errorOutput" class="warning" style="display: none;"></div>
-        
+
+        {if $error_node|eq("disabled")}
+            <div id="errorOutput" class="warning" style="display: none;"></div>
+        {elseif $errors|count|gt(0)}
+            <div class="warning">
+                <h2>{'Validation error'|i18n('extension/xrowpayone')}</h2>
+                <ul>
+                    {foreach $errors as $error}
+                        <li>{$error|wash()}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        {/if}
+
         <form id="paymentform" name="paymentform" action="" method="post">
             <input type="hidden" name="pseudocardpan" id="pseudocardpan" />
             <input type="hidden" name="truncatedcardpan" id="truncatedcardpan" />

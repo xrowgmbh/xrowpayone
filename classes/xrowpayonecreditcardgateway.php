@@ -86,6 +86,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $url = "https://secure.pay1.de/client-api" . $parameter_string;
             
             $json_response = file_get_contents($url);
+
             if( $json_response )
             {
                 $json_response = json_decode($json_response);
@@ -93,6 +94,9 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                 {
                     //get 'txid' from response and keep it
                     $txid = $json_response->txid;
+                    
+                    //get 'userid' from response and keep it
+                    $userid = $json_response->userid;
                     
                     //now store it into the order
                     $db = eZDB::instance();
@@ -105,7 +109,11 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     //first the TXID
                     $txidNode = $doc->createElement( "txid", $txid );
                     $shop_account_element->appendChild( $txidNode );
-                    
+
+                    //now the userid
+                    $useridNode = $doc->createElement( "userid", $userid );
+                    $shop_account_element->appendChild( $useridNode );
+
                     //then the payment method
                     $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
                     $shop_account_element->appendChild( $paymentmethod );
@@ -121,12 +129,14 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $order->setAttribute( 'data_text_1', $doc->saveXML() );
                     $order->store();
                     $db->commit();
-    
+                    
+                    eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
                     return eZWorkflowType::STATUS_ACCEPTED;
                 }
                 else
                 {
-                    //TODO: errorhandling?
+                    eZLog::write("FAILED in step 2 ('preauthorisation') for order ID " . $order_id . " with ERRORCODE " . $json_response->errorcode . " Message: " . $json_response->errormessage, $logName = 'xrowpayone.log', $dir = 'var/log');
+
                     //bsp 911
                     $errorcode = $json_response->errorcode;
                     //bsp Reference number already exists
@@ -137,16 +147,17 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     var_dump($errorcode);
                     var_dump($errormessage);
                     var_dump($customermessage);
-                    die("fehler aufgerteten");
+                    $errors = array($json_response->customermessage);
                 }
             }
             else
             {
+                eZLog::write("ERROR: Remote content not found in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
                 //TODO FEHLER remote content nicht gefunden 
             }
         }
 
-        $errors = array();
+        
         $process->Template = array();
         $process->Template['templateName'] = xrowPayoneCreditCardGateway::TEMPLATE;
         $process->Template['path'] = array( array( 'url' => false, 'text' => ezpI18n::tr( 'extension/xrowpayone', 'Payment Information' ) ) );

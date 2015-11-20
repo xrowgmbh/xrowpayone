@@ -66,6 +66,13 @@ class xrowpayoneOperators
                     {
                         $payone_info["truncatedcardpan"] = (string)$truncatedcardpan_element->item(0)->nodeValue;
                     }
+
+                    //try to fetch txid
+                    $userid_element = $doc->getElementsByTagName('userid');
+                    if( $txid_element->length >= 1 )
+                    {
+                        $payone_info["userid"] = (string)$userid_element->item(0)->nodeValue;
+                    }
                 }
                 else
                 {
