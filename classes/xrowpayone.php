@@ -2,27 +2,6 @@
 
 class xrowPayoneBaseGateway extends xrowEPaymentGateway
 {
-
-    static function getErrorText( $id )
-    {
-    }
-
-    static function getErrorList()
-    {
-    }
-
-    static function getAdditionalErrorText( $id )
-    {
-    }
-
-    static function getAdditionalErrorList()
-    {
-    }
-
-    public function cancel( eZOrder $order )
-    {
-    }
-
     //this function is called when chosing delivered/paid - on success it expects true
     public function capture( eZOrder $order )
     {
@@ -143,29 +122,6 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
         }
         return $result;
     }
-
-    function execute( $process, $event )
-    {
-        //die wird ausgeführt
-    }
-
-    function &createPaymentObject( &$processID, &$orderID )
-    {
-    }
-
-    static function addLeadingZero( $value )
-    {
-    }
-
-    function needCleanup()
-    {
-    }
-
-    function createShortDescription( $order, $maxDescLen )
-    {
-    }
-    
-
 }
 
 ?>

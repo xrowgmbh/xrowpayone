@@ -175,6 +175,7 @@ function check() { // Function called by submitting PAY-button
         // Perform "CreditCardCheck" to create and get a
         // PseudoCardPan; then call your function "payCallback"
     } else {
+        //TODO hier muss eine fehlermeldung kommen da z.B. auch bei altem cc valdation er hier landet. vielleicht kommt auch schon ne meldung, ist aber ausgeblendet
         console.debug("not complete");
     }
 }

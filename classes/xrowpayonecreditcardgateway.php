@@ -16,6 +16,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         $shopINI = eZINI::instance( 'shop.ini' );
         $payoneINI = eZINI::instance( 'xrowpayone.ini' );
         $processParams = $process->attribute( 'parameter_list' );
+        $errors = array();
 
         //get the current order
         $order_id = $processParams['order_id'];
@@ -117,14 +118,14 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     //then the payment method
                     $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
                     $shop_account_element->appendChild( $paymentmethod );
-    
+
                     //then the pseudocardpan
                     if ( $http->hasPostVariable( 'truncatedcardpan' ) )
                     {
                         $truncatedcardpan_node = $doc->createElement( "truncatedcardpan", $http->postVariable( 'truncatedcardpan' ) );
                         $shop_account_element->appendChild( $truncatedcardpan_node );
                     }
-    
+
                     //store it
                     $order->setAttribute( 'data_text_1', $doc->saveXML() );
                     $order->store();
@@ -147,13 +148,14 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     var_dump($errorcode);
                     var_dump($errormessage);
                     var_dump($customermessage);
+                    #TODO hier muss abgeprüft werden ob MX messsaging verwendet wird oder das von payone
+                    #das ganze muss dann ausgespielt werden und im frontent schick aussehen 
                     $errors = array($json_response->customermessage);
                 }
             }
             else
             {
                 eZLog::write("ERROR: Remote content not found in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
-                //TODO FEHLER remote content nicht gefunden 
             }
         }
 
