@@ -138,19 +138,18 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                 {
                     eZLog::write("FAILED in step 2 ('preauthorisation') for order ID " . $order_id . " with ERRORCODE " . $json_response->errorcode . " Message: " . $json_response->errormessage, $logName = 'xrowpayone.log', $dir = 'var/log');
 
-                    //bsp 911
-                    $errorcode = $json_response->errorcode;
-                    //bsp Reference number already exists
-                    $errormessage = $json_response->errormessage;
-                    //bsp An error occured while processing this transaction (wrong parameters).
-                    $customermessage = $json_response->customermessage;
-                    var_dump($url);
-                    var_dump($errorcode);
-                    var_dump($errormessage);
-                    var_dump($customermessage);
-                    #TODO hier muss abgeprüft werden ob MX messsaging verwendet wird oder das von payone
-                    #das ganze muss dann ausgespielt werden und im frontent schick aussehen 
-                    $errors = array($json_response->customermessage);
+                    if ($payoneINI->variable( 'GeneralSettings', 'CustomErrorNode' ) === "disabled")
+                    {
+                        //use default error of payone
+                        $errors = array($json_response->customermessage);
+                    }
+                    else
+                    {
+                        //use customized errors
+                        $response["errorcode"] = $json_response->errorcode;
+                        $response["errormessage"] = $json_response->errormessage;
+                        $errors = array( xrowPayoneHelper::generateCustomErrorString( $order, $response ) ) ;
+                    }
                 }
             }
             else

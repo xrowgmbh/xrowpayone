@@ -21,11 +21,11 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             
             if ( count($response_array) >= 1 AND $response_array["status"] === "APPROVED" )
             {
-                eZLog::write("SUCCESS in step 3('capture') for order ID " . $order->ID, $logName = 'xrowpayone.log', $dir = 'var/log');
+                eZLog::write("SUCCESS in step 3 ('capture') for order ID " . $order->ID, $logName = 'xrowpayone.log', $dir = 'var/log');
             }
             else
             {
-                eZLog::write("FAILED in step 3('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');
+                eZLog::write("FAILED in step 3 ('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');
                 //TODO-nice-to-have: add a error message for the editor when the capture was not successfull
                 //var_dump($response_array["errorcode"]);
                 //var_dump($response_array["errormessage"]);

@@ -61,5 +61,13 @@
       <source>Information</source>
       <translation>Informationen</translation>
     </message>
+    <message>
+      <source>Error during credit card payment</source>
+      <translation>Fehler bei der Kreditkartenzahlung</translation>
+    </message>
+    <message>
+      <source>Your creditcard data is incomplete or wrong. Please check your input again.</source>
+      <translation>Ihre Kreditkarten-Daten sind nicht komplett oder inkorrekt. Bitte überprüfen Sie Ihre Eingabe.</translation>
+    </message>
 </context>
 </TS>
