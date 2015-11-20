@@ -1,0 +1,7 @@
+INSTALLATION
+============
+
+activate extension
+make sure the paymentgateways are active
+clear cache
+run autoloads
