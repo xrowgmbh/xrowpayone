@@ -3,5 +3,6 @@ INSTALLATION
 
 activate extension
 make sure the paymentgateways are active
+set up the xrowpayone.ini settings
 clear cache
 run autoloads
