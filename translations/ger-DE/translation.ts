@@ -69,5 +69,9 @@
       <source>Your creditcard data is incomplete or wrong. Please check your input again.</source>
       <translation>Ihre Kreditkarten-Daten sind nicht komplett oder inkorrekt. Bitte überprüfen Sie Ihre Eingabe.</translation>
     </message>
+    <message>
+        <source>Credit Card</source>
+        <translation>Kreditkarte</translation>
+    </message>
 </context>
 </TS>

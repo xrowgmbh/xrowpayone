@@ -16,7 +16,10 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             {
                 //prepare a nice readable array
                 $tmp_explode_result = explode("=", $line);
-                $response_array[$tmp_explode_result[0]] = $tmp_explode_result[1];
+                if (count($tmp_explode_result) >= 2)
+                {
+                    $response_array[$tmp_explode_result[0]] = $tmp_explode_result[1];
+                }
             }
             
             if ( count($response_array) >= 1 AND $response_array["status"] === "APPROVED" )

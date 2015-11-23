@@ -170,13 +170,18 @@ document.getElementById('cardtype').onchange = function () {
 };
 
 function check() { // Function called by submitting PAY-button
+    var order_id = "{/literal}{$order.id}{literal}";
     if (iframes.isComplete()) {
         iframes.creditCardCheck('checkCallback');
         // Perform "CreditCardCheck" to create and get a
         // PseudoCardPan; then call your function "payCallback"
     } else {
-        //TODO hier muss eine fehlermeldung kommen da z.B. auch bei altem cc valdation er hier landet. vielleicht kommt auch schon ne meldung, ist aber ausgeblendet
-        console.debug("not complete");
+        $('#customized_error_output').show();
+        var error = {'errorcode': '"not set"', 'errormessage': '"user input invalid"' };
+        $.ez('payone_ajax::write_invalid_checkcreditcard_log', { "order_id": order_id, "response": error }, function(data) {
+            //do something
+        });
+        //console.debug("not complete");
     }
 }
 
