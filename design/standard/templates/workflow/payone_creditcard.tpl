@@ -27,7 +27,7 @@
         <h4>{"Please enter your credit card details"|i18n("extension/xrowpayone")}</h4>
 
         {if $error_node|eq("disabled")}
-            <div id="errorOutput" class="warning" style="display: none;"></div>
+            <div id="customized_error_output" class="warning" style="display: none;"></div>
         {elseif $errors|count|gt(0)}
             <div class="warning">
                 <h2>{'Validation error'|i18n('extension/xrowpayone')}</h2>
@@ -98,7 +98,6 @@
     </form>
 
 </div>
-
 
 {literal}
 <script>
@@ -186,15 +185,25 @@ function check() { // Function called by submitting PAY-button
 }
 
 function checkCallback(response) {
-    console.debug(response);
+    //console.debug(response);
+    var order_id = "{/literal}{$order.id}{literal}";
     if (response.status === "VALID") {
         document.getElementById("pseudocardpan").value = response.pseudocardpan;
         document.getElementById("truncatedcardpan").value = response.truncatedcardpan;
-        document.paymentform.submit();
+
+        //write the success log
+        $.ez('payone_ajax::write_valid_checkcreditcard_log', { "order_id": order_id }, function(data) {
+            //fire the form
+            document.paymentform.submit();
+        });
     }
     else
     {
-        $('#errorOutput').prepend('<h2>{/literal}{'Validation error'|i18n('extension/xrowpayone')}{literal}</h2>').show();
+        $.ez('payone_ajax::custom_error_handling', { "order_id": order_id, "response": response }, function(data) {
+            $('#customized_error_output ul').empty();
+            $('#customized_error_output ul').append("<li>" + data.content + "</li>")
+            $('#customized_error_output').show();
+        });
     }
 }
 </script>

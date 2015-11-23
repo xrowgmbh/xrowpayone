@@ -174,6 +174,6 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
 
 }
 
-xrowEPayment::registerGateway( xrowPayoneCreditCardGateway::GATEWAY_STRING, "xrowpayonecreditcardgateway", ezpI18n::tr( 'extension/xrowpayone', 'Credit Card' ) );
+xrowEPayment::registerGateway( xrowPayoneCreditCardGateway::GATEWAY_STRING, "xrowpayonecreditcardgateway", ezpI18n::tr( "extension/xrowpayone", "Credit Card" ) );
 
 ?>
