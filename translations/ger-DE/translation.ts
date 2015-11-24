@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>Send Order</source>
-      <translation>Auftrag abschließen</translation>
+      <translation>Bestellung absenden</translation>
     </message>
     <message>
       <source>Validation error</source>
