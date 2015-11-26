@@ -29,19 +29,13 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             else
             {
                 eZLog::write("FAILED in step 3 ('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');
-                //TODO-nice-to-have: add a error message for the editor when the capture was not successfull
-                //var_dump($response_array["errorcode"]);
-                //var_dump($response_array["errormessage"]);
-                die("Umstellung leider nicht möglich. Bitte wenden Sie sich an den Administrator.");
+                return "Error Code: ".$response_array["errorcode"]. " Error Message: " . $response_array["errormessage"];
             }
         }
         else
         {
             eZLog::write("ERROR: \$response not set or empty in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
-            //TODO-nice-to-have: add a error message for the editor when the capture was not successfull
-            //var_dump($response_array["errorcode"]);
-            //var_dump($response_array["errormessage"]);
-            die("Umstellung leider nicht möglich. Bitte wenden Sie sich an den Administrator.");
+            return ezpI18n::tr( 'extension/xrowpayone', 'Incorrect or no answer of the payone server.' );
         }
 
         return true;

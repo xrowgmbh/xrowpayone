@@ -73,5 +73,9 @@
         <source>Credit Card</source>
         <translation>Kreditkarte</translation>
     </message>
+    <message>
+        <source>Incorrect or no answer of the payone server.</source>
+        <translation>Inkorrekte oder keine Antwort vom Payone Server.</translation>
+    </message>
 </context>
 </TS>
