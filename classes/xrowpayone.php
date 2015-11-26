@@ -29,13 +29,13 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             else
             {
                 eZLog::write("FAILED in step 3 ('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');
-                return "Error Code: ".$response_array["errorcode"]. " Error Message: " . $response_array["errormessage"];
+                return "Error Code: ".$response_array["errorcode"]. " Error Message: " . $response_array["errormessage"] . " Order ID " . $order->ID;
             }
         }
         else
         {
-            eZLog::write("ERROR: \$response not set or empty in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
-            return ezpI18n::tr( 'extension/xrowpayone', 'Incorrect or no answer of the payone server.' );
+            eZLog::write("ERROR: \$response not set or empty in file " . __FILE__ . " on line " . __LINE__ . " for Order ID " . $order->ID, $logName = 'xrowpayone.log', $dir = 'var/log');
+            return ezpI18n::tr( 'extension/xrowpayone', 'Incorrect or no answer of the payone server.' ) . " Order ID " . $order->ID;
         }
 
         return true;
