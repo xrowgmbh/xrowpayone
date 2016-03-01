@@ -34,7 +34,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $key = $payoneINI->variable( 'GeneralSettings', 'Key' );
             $algorithm = $payoneINI->variable( 'GeneralSettings', 'Algorithm' );
             $api_version = $payoneINI->variable( 'GeneralSettings', 'APIVersion' );
-			$response_type = $payoneINI->variable( 'GeneralSettings', 'ResponseType' );
+            $response_type = $payoneINI->variable( 'GeneralSettings', 'ResponseType' );
             $cc_3d_secure_enabled = $payoneINI->variable( 'CC3DSecure', 'Enabled' );
             $error_url = $payoneINI->variable( 'CC3DSecure', 'ErrorURL' );
             $success_url = $payoneINI->variable( 'CC3DSecure', 'SuccessURL' );
@@ -62,8 +62,8 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $hash_array["currency"] = $currency_code;
             if( $cc_3d_secure_enabled == "true")
             {
-				$hash_array["successurl"] = $success_url;
-				$hash_array["errorurl"] = $error_url;
+                $hash_array["successurl"] = $success_url;
+                $hash_array["errorurl"] = $error_url;
             }
             //please note: country, lastname and pseudocardpan are not needed to be added to the hash because they are not allwoed (p.25 client doc)
 
@@ -85,8 +85,8 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $param_array["pseudocardpan"] = $pseudocardpan;
             if( $cc_3d_secure_enabled == "true")
             {
-				$param_array["successurl"] = $success_url;
-				$param_array["errorurl"] = $error_url;
+                $param_array["successurl"] = $success_url;
+                $param_array["errorurl"] = $error_url;
             }
 
             //sort params in alphabetic order
