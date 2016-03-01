@@ -26,6 +26,26 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
             {
                 eZLog::write("SUCCESS in step 3 ('capture') for order ID " . $order->ID, $logName = 'xrowpayone.log', $dir = 'var/log');
             }
+            else if ( count($response_array) >= 1 AND $response_array["status"] === "REDIRECT" )
+            {
+                //TODO - do we have 3D secure card now?
+                
+                $db = eZDB::instance();
+                $db->begin();
+
+                $doc = new DOMDocument( '1.0', 'utf-8' );
+                $doc->loadXML($order->DataText1);
+                $shop_account_element = $doc->getElementsByTagName('shop_account');
+                $shop_account_element = $shop_account_element->item(0);
+
+                $reservedFlag = $doc->createElement( "3d_reserved", "false" );
+                $shop_account_element->appendChild( $reservedFlag );
+                
+                //store it
+                $order->setAttribute( 'data_text_1', $doc->saveXML() );
+                $order->store();
+                $db->commit();
+            }
             else
             {
                 eZLog::write("FAILED in step 3 ('capture') for order ID " . $order->ID . " with ERRORCODE " . $response_array['errorcode'] . " Message: " . $response_array['errormessage'], $logName = 'xrowpayone.log', $dir = 'var/log');

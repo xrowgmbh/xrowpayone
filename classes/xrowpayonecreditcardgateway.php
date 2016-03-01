@@ -34,6 +34,10 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $key = $payoneINI->variable( 'GeneralSettings', 'Key' );
             $algorithm = $payoneINI->variable( 'GeneralSettings', 'Algorithm' );
             $api_version = $payoneINI->variable( 'GeneralSettings', 'APIVersion' );
+			$response_type = $payoneINI->variable( 'GeneralSettings', 'ResponseType' );
+            $cc_3d_secure_enabled = $payoneINI->variable( 'CC3DSecure', 'Enabled' );
+            $error_url = $payoneINI->variable( 'CC3DSecure', 'ErrorURL' );
+            $success_url = $payoneINI->variable( 'CC3DSecure', 'SuccessURL' );
 
             //prepare some parameter values
             $order_total_in_cent = (string)$order->totalIncVAT()*100;
@@ -51,12 +55,17 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $hash_array["api_version"] = $api_version;
             $hash_array["mode"] = $mode;
             $hash_array["request"] = "preauthorization";
-            $hash_array["responsetype"] = "JSON";
+            $hash_array["responsetype"] = $response_type;
             $hash_array["clearingtype"] = "cc";
             $hash_array["reference"] = $order_id;
             $hash_array["amount"] = $order_total_in_cent;
             $hash_array["currency"] = $currency_code;
-            //please note: country, lastname and pseudocardpan dont need to be added to the hash because they are not allwoed (p.25 client doc)
+            if( $cc_3d_secure_enabled == "true")
+            {
+				$hash_array["successurl"] = $success_url;
+				$hash_array["errorurl"] = $error_url;
+            }
+            //please note: country, lastname and pseudocardpan are not needed to be added to the hash because they are not allwoed (p.25 client doc)
 
             //create param array
             $param_array["aid"] = $aid;
@@ -65,7 +74,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $param_array["api_version"] = $api_version;
             $param_array["mode"] = $mode;
             $param_array["request"] = "preauthorization";
-            $param_array["responsetype"] = "JSON";
+            $param_array["responsetype"] = $response_type;
             $param_array["hash"] = xrowPayoneHelper::generate_hash( $algorithm, $hash_array, $key );
             $param_array["clearingtype"] = "cc";
             $param_array["reference"] = $order_id;
@@ -74,7 +83,12 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $param_array["lastname"] = $last_name;
             $param_array["country"] = $country_alpha2;
             $param_array["pseudocardpan"] = $pseudocardpan;
-            
+            if( $cc_3d_secure_enabled == "true")
+            {
+				$param_array["successurl"] = $success_url;
+				$param_array["errorurl"] = $error_url;
+            }
+
             //sort params in alphabetic order
             ksort($param_array);
             

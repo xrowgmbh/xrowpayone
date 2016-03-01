@@ -11,7 +11,7 @@
      $encoding = ezini( 'GeneralSettings', 'Encoding', 'xrowpayone.ini')
      $error_node = ezini( 'GeneralSettings', 'CustomErrorNode', 'xrowpayone.ini')
      $request_type = "creditcardcheck"
-     $response_type = "JSON"
+     $response_type = ezini( 'GeneralSettings', 'ResponseType', 'xrowpayone.ini')
      $storecarddata = "yes"
      $api_version = ezini( 'GeneralSettings', 'APIVersion', 'xrowpayone.ini')
      $cc_hash_array = hash("aid", $aid, "encoding", $encoding, "mid", $mid, "mode", $payone_mode, "portalid", $portal_id, "request", $request_type, "responsetype", $response_type, "storecarddata", $storecarddata, "api_version", $api_version )
