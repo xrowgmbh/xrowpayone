@@ -133,6 +133,13 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
                     $shop_account_element->appendChild( $paymentmethod );
 
+                    if( $json_response->status === "REDIRECT" )
+                    {
+                        //TODO - do we have 3D secure card now?
+                        $reservedFlag = $doc->createElement( "3d_reserved", "false" );
+                        $shop_account_element->appendChild( $reservedFlag );
+                    }
+
                     //then the pseudocardpan
                     if ( $http->hasPostVariable( 'truncatedcardpan' ) )
                     {

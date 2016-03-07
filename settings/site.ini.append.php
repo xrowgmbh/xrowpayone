@@ -6,4 +6,8 @@ TranslationExtensions[]=xrowpayone
 [TemplateSettings]
 ExtensionAutoloadPath[]=xrowpayone
 
+[RoleSettings]
+PolicyOmitList[]=xrowpayone/successurl
+PolicyOmitList[]=xrowpayone/errorurl
+
 */ ?>
