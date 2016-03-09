@@ -17,6 +17,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         $payoneINI = eZINI::instance( 'xrowpayone.ini' );
         $processParams = $process->attribute( 'parameter_list' );
         $errors = array();
+        $process_id = $process->ID;
 
         //get the current order
         $order_id = $processParams['order_id'];
@@ -40,6 +41,8 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $success_url = $payoneINI->variable( 'CC3DSecure', 'SuccessURL' );
 
             //prepare some parameter values
+            $error_url = $error_url . "/orderID/" . $order_id . "/processID/" . $process->ID;
+            $success_url = $success_url . "/orderID/" . $order_id . "/processID/" . $process->ID;
             $order_total_in_cent = (string)$order->totalIncVAT()*100;
             $currency_code = $order->currencyCode();
             $order_xml = simplexml_load_string($order->DataText1);
@@ -133,13 +136,6 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
                     $shop_account_element->appendChild( $paymentmethod );
 
-                    if( $json_response->status === "REDIRECT" )
-                    {
-                        //TODO - do we have 3D secure card now?
-                        $reservedFlag = $doc->createElement( "3d_reserved", "false" );
-                        $shop_account_element->appendChild( $reservedFlag );
-                    }
-
                     //then the pseudocardpan
                     if ( $http->hasPostVariable( 'truncatedcardpan' ) )
                     {
@@ -147,13 +143,34 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                         $shop_account_element->appendChild( $truncatedcardpan_node );
                     }
 
+                    if( $json_response->status === "REDIRECT" )
+                    {
+                        //save reserved flag false for now
+                        $reservedFlag = $doc->createElement( "cc3d_reserved", "false" );
+                        $shop_account_element->appendChild( $reservedFlag );
+                    }
+                    else
+                    {
+                        //TODO remove cc3d_reserved if exists because it could have happened, that someone changed from 3d CC to normal CC.
+                    }
+
                     //store it
                     $order->setAttribute( 'data_text_1', $doc->saveXML() );
                     $order->store();
                     $db->commit();
                     
-                    eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
-                    return eZWorkflowType::STATUS_ACCEPTED;
+                    if( $json_response->status === "REDIRECT" )
+                    {
+                        eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card detected - REDIRECTING :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+                        //do redirect to 3d secure password confirm page
+                        http_redirect( $json_response->redirecturl );
+                        exit;
+                    }
+                    else
+                    {
+                        eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+                        return eZWorkflowType::STATUS_ACCEPTED;
+                    }
                 }
                 else
                 {
