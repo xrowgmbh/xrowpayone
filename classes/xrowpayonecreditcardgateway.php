@@ -23,6 +23,14 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         $order_id = $processParams['order_id'];
         $order = eZOrder::fetch( $order_id );
 
+        //checking if its only a redirect and so the preauthorisation is already finished
+        $paymentObj = xrowPaymentObject::fetchByOrderID( $order_id );
+        if ( is_object( $paymentObj ) && $paymentObj->approved() )
+        {
+            eZLog::write("SUCCESS in step 2 ('preauthorisation') ::3D Secure Card detected - FINISHED :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+            return eZWorkflowType::STATUS_ACCEPTED;
+        }
+
         //STEP 2: preauthorisation
         if ( $http->hasPostVariable( 'pseudocardpan' ) )
         {
@@ -39,10 +47,12 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $cc_3d_secure_enabled = $payoneINI->variable( 'CC3DSecure', 'Enabled' );
             $error_url = $payoneINI->variable( 'CC3DSecure', 'ErrorURL' );
             $success_url = $payoneINI->variable( 'CC3DSecure', 'SuccessURL' );
+            $siteaccess = $GLOBALS['eZCurrentAccess'];
+            $siteaccess = $siteaccess["name"];
 
             //prepare some parameter values
-            $error_url = $error_url . "/orderID/" . $order_id . "/processID/" . $process->ID;
-            $success_url = $success_url . "/orderID/" . $order_id . "/processID/" . $process->ID;
+            $error_url = $error_url . "/orderID/" . $order_id . "/siteaccess/" . $siteaccess;
+            $success_url = $success_url . "/orderID/" . $order_id . "/siteaccess/" . $siteaccess;
             $order_total_in_cent = (string)$order->totalIncVAT()*100;
             $currency_code = $order->currencyCode();
             $order_xml = simplexml_load_string($order->DataText1);

@@ -14,17 +14,8 @@
      $response_type = ezini( 'GeneralSettings', 'ResponseType', 'xrowpayone.ini')
      $storecarddata = "yes"
      $api_version = ezini( 'GeneralSettings', 'APIVersion', 'xrowpayone.ini')
-     $cc_3d_secure_enabled =  ezini( 'CC3DSecure', 'Enabled', 'xrowpayone.ini')
      $cc_hash_array = hash("aid", $aid, "encoding", $encoding, "mid", $mid, "mode", $payone_mode, "portalid", $portal_id, "request", $request_type, "responsetype", $response_type, "storecarddata", $storecarddata, "api_version", $api_version )
 }
-
-{if $cc_3d_secure_enabled|eq("true")}
-    {def $success_url = ezini( 'CC3DSecure', 'SuccessURL', 'xrowpayone.ini')
-         $error_url = ezini( 'CC3DSecure', 'ErrorURL', 'xrowpayone.ini')
-         $cc_3d_hash_array = hash("errorurl", $error_url, "successurl", $success_url)
-    }
-    {set $cc_hash_array = $cc_hash_array|merge($cc_3d_hash_array)}
-{/if}
 
 {* CONFIGURATION END *}
 
@@ -168,10 +159,6 @@ request = {
     storecarddata: '{/literal}{$storecarddata}{literal}', // fixed value
     //key: '{/literal}{$payone_key}{literal}', //PMI Portal key
     api_version: '{/literal}{$api_version}{literal}', //3.9 New API-version from 2015-01-05
-    {/literal}{if $cc_3d_secure_enabled|eq("true")}
-    successurl: '{$success_url}',
-    errorurl: '{$error_url}',
-    {/if}{literal}
     hash: '{/literal}{hashcreate( $algorithm, $cc_hash_array, $payone_key )}{literal}'
 };
 
