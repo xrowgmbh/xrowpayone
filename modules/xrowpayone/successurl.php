@@ -1,48 +1,30 @@
 <?php
 
 $Module = & $Params['Module'];
-$http = eZHTTPTool::instance();
-#$namedParameters = $Module->NamedParameters;
-#$tpl = eZTemplate::factory();
-$db = eZDB::instance();
-#$current_user = eZUser::currentUser();
-#$user_id = $current_user->ContentObjectID;
-#$xrowForumINI = eZINI::instance( 'xrowforum.ini' );
-#$user_class_id = $xrowForumINI->variable( 'ClassIDs', 'User' );
-#$tpl->setVariable( 'success', $success );
-
 $order_id = $Params["orderID"];
-$siteaccess = $Params["siteaccess"];
 
 if( isset($order_id) )
 {
     eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card password ACCEPTED :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
 
-    $paymentObj = xrowPaymentObject::fetchByOrderID( $orderID );
+    //create the payment gateway - not the best position but at least it works here :)
+    $payment = xrowPaymentObject::createNew( (int)$order_id, xrowPayoneCreditCardGateway::GATEWAY_STRING );
+    $payment->store();
+
+    //store paymentobject and approve it (required to finish the order)
+    $paymentObj = xrowPaymentObject::fetchByOrderID( $order_id );
     $paymentObj->approve();
-    $paymentObj->store();
 
-    if( isset($siteaccess) )
-    {
-        $Module->redirectTo( '/shop/checkout/' );
-    }
-    else
-    {
-        $Module->redirectTo( '/' . $siteaccess . '/shop/checkout/' );
-    }
+    eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card password REDIRECTING to orderview :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
 
-    eZLog::write("PENDING in step 2 ('preauthorisation') :: sending to order confirmation :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+    //redirect into the shopping process => finishing the order!
+    $Module->redirectTo( '/shop/checkout/' );
 }
 else
 {
-    //TODO: error!
+    return $Module->handleError( 1, 'kernel' );
 }
 
 $Result = array();
-#$Result['content'] = $tpl->fetch( 'design:pm/network.tpl' );
-#$Result['path'] = array( array( 'url' => "/",
-#                                'text' => ezpI18n::tr( 'extension/xrowpm', 'Home' ) ),
-#                         array( 'url' => false,
-#                                'text' => ezpI18n::tr( 'extension/xrowpm', 'My Network' ) ) );
-    
+
 ?>

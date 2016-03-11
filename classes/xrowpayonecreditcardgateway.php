@@ -13,6 +13,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
     function execute( $process, $event )
     {
         $http = eZHTTPTool::instance();
+        $siteINI = eZINI::instance( 'site.ini' );
         $shopINI = eZINI::instance( 'shop.ini' );
         $payoneINI = eZINI::instance( 'xrowpayone.ini' );
         $processParams = $process->attribute( 'parameter_list' );
@@ -36,6 +37,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         {
             //fetching settings
             $pseudocardpan = $http->postVariable( 'pseudocardpan' );
+            $site_url = $siteINI->variable( 'SiteSettings', 'SiteURL' );
             $aid = $payoneINI->variable( 'GeneralSettings', 'AID' );
             $mid = $payoneINI->variable( 'GeneralSettings', 'MID' );
             $portal_id = $payoneINI->variable( 'GeneralSettings', 'PortalID' );
@@ -51,8 +53,8 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $siteaccess = $siteaccess["name"];
 
             //prepare some parameter values
-            $error_url = $error_url . "/orderID/" . $order_id . "/siteaccess/" . $siteaccess;
-            $success_url = $success_url . "/orderID/" . $order_id . "/siteaccess/" . $siteaccess;
+            $error_url = "https://" . $site_url  . "/" . $siteaccess . "/" . $error_url  . "/orderID/" . $order_id;
+            $success_url = "https://" . $site_url  . "/" . $siteaccess . "/" . $success_url  . "/orderID/" . $order_id;
             $order_total_in_cent = (string)$order->totalIncVAT()*100;
             $currency_code = $order->currencyCode();
             $order_xml = simplexml_load_string($order->DataText1);
@@ -168,7 +170,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $order->setAttribute( 'data_text_1', $doc->saveXML() );
                     $order->store();
                     $db->commit();
-                    
+
                     if( $json_response->status === "REDIRECT" )
                     {
                         eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card detected - REDIRECTING :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
@@ -179,6 +181,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     else
                     {
                         eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+
                         return eZWorkflowType::STATUS_ACCEPTED;
                     }
                 }
@@ -205,7 +208,11 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                 eZLog::write("ERROR: Remote content not found in file " . __FILE__ . " on line " . __LINE__, $logName = 'xrowpayone.log', $dir = 'var/log');
             }
         }
-
+        else if ( is_object( $paymentObj ) )
+        {
+            //that means, that we have a paymentobject which is not approved. its not approved because the payment has failed so we return a array
+            $errors = array( ezpI18n::tr( 'extension/xrowpayone', 'Error occured during payment process. Please choose your payment option again.') );
+        }
         
         $process->Template = array();
         $process->Template['templateName'] = xrowPayoneCreditCardGateway::TEMPLATE;

@@ -77,5 +77,9 @@
         <source>Incorrect or no answer of the payone server.</source>
         <translation>Inkorrekte oder keine Antwort vom Payone Server.</translation>
     </message>
+    <message>
+        <source>Error occured during payment process. Please choose your payment option again.</source>
+        <translation>Während des Bezahlvorgangs ist ein Fehler aufgetreten. Bitte wählen Sie erneut Ihre Bezahlmethode.</translation>
+    </message>
 </context>
 </TS>
