@@ -154,9 +154,11 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                         $truncatedcardpan_node = $doc->createElement( "truncatedcardpan", $http->postVariable( 'truncatedcardpan' ) );
                         $shop_account_element->appendChild( $truncatedcardpan_node );
                     }
-
                     if( $json_response->status === "REDIRECT" )
                     {
+                        $truncatedcardpan_node1 = $doc->createElement( "truncatedcardpan1", "gewitter" );
+                        $shop_account_element->appendChild( $truncatedcardpan_node1 );
+
                         //save reserved flag false for now
                         $reservedFlag = $doc->createElement( "cc3d_reserved", "false" );
                         $shop_account_element->appendChild( $reservedFlag );
@@ -165,6 +167,9 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     {
                         //TODO remove cc3d_reserved if exists because it could have happened, that someone changed from 3d CC to normal CC.
                     }
+
+                    //i must store here redundant otherwise the order will not be stored since its stuck in a transaction
+                    $db->commit();
 
                     //store it
                     $order->setAttribute( 'data_text_1', $doc->saveXML() );
@@ -181,7 +186,6 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     else
                     {
                         eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
-
                         return eZWorkflowType::STATUS_ACCEPTED;
                     }
                 }
@@ -212,6 +216,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         {
             //that means, that we have a paymentobject which is not approved. its not approved because the payment has failed so we return a array
             $errors = array( ezpI18n::tr( 'extension/xrowpayone', 'Error occured during payment process. Please choose your payment option again.') );
+            $paymentObj->remove();
         }
         
         $process->Template = array();

@@ -29,7 +29,7 @@
         {if $error_node|eq("disabled")}
             <div id="customized_error_output" class="warning" style="display: none;"></div>
         {elseif $errors|count|gt(0)}
-            <div class="warning">
+            <div id="fix_error_output" class="warning">
                 <h2>{'Validation error'|i18n('extension/xrowpayone')}</h2>
                 <ul>
                     {foreach $errors as $error}
@@ -176,6 +176,7 @@ function check() { // Function called by submitting PAY-button
         // PseudoCardPan; then call your function "payCallback"
     } else {
         $('#customized_error_output').show();
+        $('#fix_error_output').hide();
         var error = {'errorcode': '"not set"', 'errormessage': '"user input invalid"' };
         $.ez('payone_ajax::write_invalid_checkcreditcard_log', { "order_id": order_id, "response": error }, function(data) {
             //do something
@@ -203,6 +204,7 @@ function checkCallback(response) {
             $('#customized_error_output ul').empty();
             $('#customized_error_output ul').append("<li>" + data.content + "</li>")
             $('#customized_error_output').show();
+            $('#fix_error_output').hide();
         });
     }
 }
