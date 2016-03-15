@@ -73,6 +73,13 @@ class xrowpayoneOperators
                     {
                         $payone_info["userid"] = (string)$userid_element->item(0)->nodeValue;
                     }
+                    
+                    //try to fetch 3d secure payment status
+                    $cc3d_reserved_element = $doc->getElementsByTagName('cc3d_reserved');
+                    if( $cc3d_reserved_element->length >= 1 )
+                    {
+                        $payone_info["cc3d_reserved"] = (string)$cc3d_reserved_element->item(0)->nodeValue;
+                    }
                 }
                 else
                 {

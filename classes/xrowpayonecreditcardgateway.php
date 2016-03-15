@@ -156,16 +156,26 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     }
                     if( $json_response->status === "REDIRECT" )
                     {
-                        $truncatedcardpan_node1 = $doc->createElement( "truncatedcardpan1", "gewitter" );
-                        $shop_account_element->appendChild( $truncatedcardpan_node1 );
-
+                        //remove first if exists
+                        $cc3d_sec_elements = $doc->getElementsByTagName('cc3d_reserved');
+                        if( $cc3d_sec_elements->length >= 1 )
+                        {
+                            $cc3d_sec_element = $cc3d_sec_elements->item(0);
+                            $cc3d_sec_element->parentNode->removeChild($cc3d_sec_element);
+                        }
                         //save reserved flag false for now
                         $reservedFlag = $doc->createElement( "cc3d_reserved", "false" );
                         $shop_account_element->appendChild( $reservedFlag );
                     }
                     else
                     {
-                        //TODO remove cc3d_reserved if exists because it could have happened, that someone changed from 3d CC to normal CC.
+                        //remove cc3d_reserved if exists. this case could occure if someone changed from 3d CC to normal CC.
+                        $cc3d_sec_elements = $doc->getElementsByTagName('cc3d_reserved');
+                        if( $cc3d_sec_elements->length >= 1 )
+                        {
+                            $cc3d_sec_element = $cc3d_sec_elements->item(0);
+                            $cc3d_sec_element->parentNode->removeChild($cc3d_sec_element);
+                        }
                     }
 
                     //i must store here redundant otherwise the order will not be stored since its stuck in a transaction
@@ -178,7 +188,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
 
                     if( $json_response->status === "REDIRECT" )
                     {
-                        eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card detected - REDIRECTING :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+                        eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card detected - REDIRECTING to creditcard institute check :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
                         //do redirect to 3d secure password confirm page
                         http_redirect( $json_response->redirecturl );
                         exit;

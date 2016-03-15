@@ -11,7 +11,7 @@ if( isset($order_id) )
     $payment = xrowPaymentObject::createNew( (int)$order_id, xrowPayoneCreditCardGateway::GATEWAY_STRING );
     $payment->store();
 
-    eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card password REDIRECTING to orderview :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
+    eZLog::write("PENDING in step 2 ('preauthorisation') ::3D Secure Card password REDIRECTING back to checkout :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
 
     //redirect into the shopping process => finishing the order!
     $Module->redirectTo( '/shop/checkout/' );

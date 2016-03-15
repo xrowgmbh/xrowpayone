@@ -14,8 +14,14 @@ $ViewList['successurl'] = array( 'functions' => array( 'successurl' ),
                             'unordered_params' => array( 'orderID' => 'orderID' ),
                             'params' => array());
 
+$ViewList['statuscheck'] = array( 'functions' => array( 'statuscheck' ),
+                            'script' => 'statuscheck.php',
+                            'unordered_params' => array(),
+                            'params' => array());
+
 $FunctionList = array();
 $FunctionList['errorurl'] = array();
 $FunctionList['successurl'] = array();
+$FunctionList['statuscheck'] = array();
 
 ?>
