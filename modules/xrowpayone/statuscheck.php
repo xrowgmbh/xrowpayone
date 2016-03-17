@@ -45,6 +45,10 @@ if ($http->hasPostVariable( 'txid' ))
     {
         eZLog::write("PENDING in step 3 ('capture') ::transaction module call:: for txid ". $txid . ":::::status:::: " . $txaction , $logName = 'xrowpayone.log', $dir = 'var/log');
     }
+    elseif( $txaction === "capture" )
+    {
+        eZLog::write("PENDING in step 3 ('capture') ::transaction module call:: for txid ". $txid . ":::::status:::: " . $txaction , $logName = 'xrowpayone.log', $dir = 'var/log');
+    }
     else
     {
         $tpl->setVariable( 'error', 'ERROR - status' . $txaction );
