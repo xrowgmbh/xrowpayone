@@ -28,6 +28,9 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
         $paymentObj = xrowPaymentObject::fetchByOrderID( $order_id );
         if ( is_object( $paymentObj ) && $paymentObj->approved() )
         {
+            //now disapprove again because its 3d CC payment and its only paid when capture is successful
+            $paymentObj->reject();
+            xrowPayoneCreditCardGateway::setPaymentMethod($order);
             eZLog::write("SUCCESS in step 2 ('preauthorisation') ::3D Secure Card detected - FINISHED :: for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
             return eZWorkflowType::STATUS_ACCEPTED;
         }
@@ -144,10 +147,6 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $useridNode = $doc->createElement( "userid", $userid );
                     $shop_account_element->appendChild( $useridNode );
 
-                    //then the payment method
-                    $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
-                    $shop_account_element->appendChild( $paymentmethod );
-
                     //then the pseudocardpan
                     if ( $http->hasPostVariable( 'truncatedcardpan' ) )
                     {
@@ -195,6 +194,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     }
                     else
                     {
+                        xrowPayoneCreditCardGateway::setPaymentMethod($order);
                         eZLog::write("SUCCESS in step 2 ('preauthorisation') for order ID " . $order_id, $logName = 'xrowpayone.log', $dir = 'var/log');
                         return eZWorkflowType::STATUS_ACCEPTED;
                     }
@@ -240,6 +240,27 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
 
         // return eZWorkflowType::STATUS_REJECTED;
         return eZWorkflowType::STATUS_FETCH_TEMPLATE_REPEAT;
+    }
+
+    function setPaymentMethod( $order )
+    {
+                    $db = eZDB::instance();
+                    $db->begin();
+
+                    $doc = new DOMDocument( '1.0', 'utf-8' );
+                    $doc->loadXML($order->DataText1);
+                    $shop_account_element = $doc->getElementsByTagName('shop_account');
+                    $shop_account_element = $shop_account_element->item(0);
+                    $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
+                    $shop_account_element->appendChild( $paymentmethod );
+
+                    $db->commit();
+
+                    //store it
+                    $order->setAttribute( 'data_text_1', $doc->saveXML() );
+                    $order->store();
+                    $db->commit();
+
     }
 
 }

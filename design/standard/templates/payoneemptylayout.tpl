@@ -1,1 +1,1 @@
-TSOK
+{$module_result.content}

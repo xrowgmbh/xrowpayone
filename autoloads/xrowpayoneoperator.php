@@ -80,6 +80,13 @@ class xrowpayoneOperators
                     {
                         $payone_info["cc3d_reserved"] = (string)$cc3d_reserved_element->item(0)->nodeValue;
                     }
+
+                    //try to fetch the paymentgateway
+                    $paymentmethod_element = $doc->getElementsByTagName('paymentmethod');
+                    if( $paymentmethod_element->length >= 1 )
+                    {
+                        $payone_info["paymentmethod"] = (string)$paymentmethod_element->item(0)->nodeValue;
+                    }
                 }
                 else
                 {
