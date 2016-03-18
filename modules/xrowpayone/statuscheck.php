@@ -38,7 +38,7 @@ if ($http->hasPostVariable( 'txid' ))
         }
         else
         {
-            eZLog::write("PENDING in step 2 ('preauthorisation') ::transaction module call:: for txid ". $txid . " specific order could not be determined", $logName = 'xrowpayone.log', $dir = 'var/log');
+            eZLog::write("PENDING in step 2 ('preauthorisation') ::transaction module call:: for txid ". $txid . " specific order could not be determined (this is normal if the action was caused by a normal credit card without 3d secure protection!)", $logName = 'xrowpayone.log', $dir = 'var/log');
         }
     }
     elseif( $txaction === "paid" )
