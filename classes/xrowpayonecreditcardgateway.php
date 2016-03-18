@@ -138,18 +138,42 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
                     $doc->loadXML($order->DataText1);
                     $shop_account_element = $doc->getElementsByTagName('shop_account');
                     $shop_account_element = $shop_account_element->item(0);
-                    
-                    //first the TXID
+
+                    //handle and store the TXID
+                    //remove first if exists
+                    $txid_elements = $doc->getElementsByTagName('txid');
+                    if( $txid_elements->length >= 1 )
+                    {
+                        $txid_element = $txid_elements->item(0);
+                        $txid_element->parentNode->removeChild($txid_element);
+                    }
+                    //then create
                     $txidNode = $doc->createElement( "txid", $txid );
                     $shop_account_element->appendChild( $txidNode );
 
-                    //now the userid
+                    //handle and store the userid
+                    //remove first if exists
+                    $userid_elements = $doc->getElementsByTagName('userid');
+                    if( $userid_elements->length >= 1 )
+                    {
+                        $userid_element = $userid_elements->item(0);
+                        $userid_element->parentNode->removeChild($userid_element);
+                    }
+                    //then create
                     $useridNode = $doc->createElement( "userid", $userid );
                     $shop_account_element->appendChild( $useridNode );
 
-                    //then the pseudocardpan
+                    //handle and store the pseudocardpan
                     if ( $http->hasPostVariable( 'truncatedcardpan' ) )
                     {
+                        //remove first if exists
+                        $tpan_elements = $doc->getElementsByTagName('truncatedcardpan');
+                        if( $tpan_elements->length >= 1 )
+                        {
+                            $tpan_element = $tpan_elements->item(0);
+                            $tpan_element->parentNode->removeChild($tpan_element);
+                        }
+                        //then create
                         $truncatedcardpan_node = $doc->createElement( "truncatedcardpan", $http->postVariable( 'truncatedcardpan' ) );
                         $shop_account_element->appendChild( $truncatedcardpan_node );
                     }
@@ -244,25 +268,23 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
 
     function setPaymentMethod( $order )
     {
-                    $db = eZDB::instance();
-                    $db->begin();
+        $db = eZDB::instance();
+        $db->begin();
 
-                    $doc = new DOMDocument( '1.0', 'utf-8' );
-                    $doc->loadXML($order->DataText1);
-                    $shop_account_element = $doc->getElementsByTagName('shop_account');
-                    $shop_account_element = $shop_account_element->item(0);
-                    $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
-                    $shop_account_element->appendChild( $paymentmethod );
+        $doc = new DOMDocument( '1.0', 'utf-8' );
+        $doc->loadXML($order->DataText1);
+        $shop_account_element = $doc->getElementsByTagName('shop_account');
+        $shop_account_element = $shop_account_element->item(0);
+        $paymentmethod = $doc->createElement( xrowECommerce::ACCOUNT_KEY_PAYMENTMETHOD, xrowPayoneCreditCardGateway::GATEWAY_STRING );
+        $shop_account_element->appendChild( $paymentmethod );
 
-                    $db->commit();
+        $db->commit();
 
-                    //store it
-                    $order->setAttribute( 'data_text_1', $doc->saveXML() );
-                    $order->store();
-                    $db->commit();
-
+        //store it
+        $order->setAttribute( 'data_text_1', $doc->saveXML() );
+        $order->store();
+        $db->commit();
     }
-
 }
 
 xrowEPayment::registerGateway( xrowPayoneCreditCardGateway::GATEWAY_STRING, "xrowpayonecreditcardgateway", ezpI18n::tr( "extension/xrowpayone", "Credit Card" ) );
