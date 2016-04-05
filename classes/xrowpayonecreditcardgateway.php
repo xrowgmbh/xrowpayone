@@ -118,7 +118,25 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             
             $url = "https://secure.pay1.de/client-api" . $parameter_string;
             
-            $json_response = file_get_contents($url);
+            if ( $siteINI->hasVariable( 'ProxySettings', 'ProxyServer' ) && $siteINI->variable( 'ProxySettings', 'ProxyServer' ) != "" )
+            {
+                $proxyserver = $siteINI->variable( 'ProxySettings', 'ProxyServer' );
+                //now get the proxy url
+                if ( strpos($proxyserver, "://")  !== false)
+                {
+                    $proxy_parts = explode("://", $proxyserver);
+                    $proxyserver = $proxy_parts[1];
+                }
+
+                $context_array = array('http'=>array('method' => 'GET', 'proxy' => $proxyserver));
+                $context = stream_context_create($context_array);
+
+                $json_response = file_get_contents($url, false, $context);
+            }
+            else
+            {
+                $json_response = file_get_contents($url);
+            }
 
             if( $json_response )
             {
