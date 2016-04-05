@@ -93,11 +93,16 @@ class xrowPayoneBaseGateway extends xrowEPaymentGateway
 
         if ( function_exists( 'curl_init' ) )
         {
+            $siteINI = eZINI::instance( 'site.ini' );
             //open connection
             $ch = curl_init();
 
             //set the url, number of POST vars, POST data
             curl_setopt($ch, CURLOPT_URL, $url);
+            if ( $siteINI->hasVariable( 'ProxySettings', 'ProxyServer' ) && $siteINI->variable( 'ProxySettings', 'ProxyServer' ) != "" )
+            {
+                curl_setopt($ch, CURLOPT_PROXY, $siteINI->variable( 'ProxySettings', 'ProxyServer' ));
+            }
             curl_setopt($ch, CURLOPT_POST, count($param_array));
             curl_setopt($ch, CURLOPT_POSTFIELDS, $parameter_string);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
