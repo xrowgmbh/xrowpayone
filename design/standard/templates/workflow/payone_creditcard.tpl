@@ -157,7 +157,6 @@ request = {
     portalid: '{/literal}{$portal_id}{literal}', // your PortalId
     encoding: '{/literal}{$encoding}{literal}', // desired encoding
     storecarddata: '{/literal}{$storecarddata}{literal}', // fixed value
-    //key: '{/literal}{$payone_key}{literal}', //PMI Portal key
     api_version: '{/literal}{$api_version}{literal}', //3.9 New API-version from 2015-01-05
     hash: '{/literal}{hashcreate( $algorithm, $cc_hash_array, $payone_key )}{literal}'
 };
