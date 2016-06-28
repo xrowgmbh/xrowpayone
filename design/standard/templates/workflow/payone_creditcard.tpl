@@ -116,7 +116,7 @@ config = {
         iframe: {
             width: "60px"
         },
-        style: "width: 60px height: 22px; border: 1px solid #369;"
+        style: "width: 60px; height: 22px; border: 1px solid #369;"
     },
     cardexpiremonth: {
         selector: "cardexpiremonth", // put name of your div-container here
