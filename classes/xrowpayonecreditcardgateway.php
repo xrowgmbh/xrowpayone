@@ -98,7 +98,7 @@ class xrowPayoneCreditCardGateway extends xrowPayoneBaseGateway
             $param_array["reference"] = $order_id;
             $param_array["amount"] = $order_total_in_cent;
             $param_array["currency"] = $currency_code;
-            $param_array["lastname"] = $last_name;
+            $param_array["lastname"] = urlencode($last_name);
             $param_array["country"] = $country_alpha2;
             $param_array["pseudocardpan"] = $pseudocardpan;
             if( $cc_3d_secure_enabled == "true")
